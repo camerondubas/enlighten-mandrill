@@ -12,12 +12,8 @@ try {
     require(configPath);
 } catch (e) {
     // It isn't accessible
+    // TODO: Error handling
 }
-
-// require('./.config');
-console.log('=============');
-console.log('PORT:', process.env.SLACK_URL);
-console.log('=============');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -48,8 +44,6 @@ app.post('/webhooks/mandrill', (req, res) => {
       });
     }
   }, this);
-
-
 
    res.send(req.body);
 });
