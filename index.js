@@ -21,7 +21,7 @@ app.post('/webhooks/mandrill', (req, res) => {
       slackMessage = {
         "text": `It was sent to ${event.msg.email}`,
         "username": "An Email Just Bounced",
-        "icon_emoji": ":ghost:"
+        "icon_emoji": ":email:"
       };
     }
   }, this);
@@ -34,7 +34,6 @@ app.post('/webhooks/mandrill', (req, res) => {
       console.log('Post Complete');
       console.log(err);
       console.log(body);
-
   });
 
    res.send(req.body);
