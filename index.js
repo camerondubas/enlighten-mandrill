@@ -1,7 +1,8 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
-var port = 8008;
+
+app.set('port', (process.env.PORT || 5000));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,6 +17,6 @@ app.post('/test', (req, res) => {
    res.send();
 });
 
-app.listen(port, function () {
-  console.log(`Example app listening on port ${port}`);
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
 });
