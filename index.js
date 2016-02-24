@@ -13,7 +13,10 @@ app.get('/', (req, res) => {
 });
 
 app.post('/webhooks/mandrill', (req, res) => {
+  console.log('===========');
   console.log('POST Received');
+  console.log(req.body);
+  console.log('===========');
   var events = req.body.mandrill_events;
   var slackMessage;
   events.forEach(event => {
@@ -30,7 +33,7 @@ app.post('/webhooks/mandrill', (req, res) => {
     url:'https://hooks.slack.com/services/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',
     json: true,
     body: slackMessage
-  }, function(err,httpResponse,body){
+  }, function(err, httpResponse, body){
       console.log('Post Complete');
       console.log(err);
       console.log(body);
