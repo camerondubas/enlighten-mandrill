@@ -11,10 +11,10 @@ app.get('/', (req, res) => {
   res.send('<h1>Slack Mandrill</h1>');
 });
 
-app.post('/test', (req, res) => {
+app.post('/webhooks/mandrill', (req, res) => {
    console.log('POST Received');
    console.log(req.body);
-   res.send();
+   res.send(req.body);
 });
 
 app.listen(app.get('port'), function() {
