@@ -13,13 +13,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/webhooks/mandrill', (req, res) => {
-  console.log('===========');
-  console.log('POST Received');
-  console.log(req.body.mandrill_events);
-  console.log('===========');
-  console.log(JSON.parse(req.body.mandrill_events));
-  console.log('===========');
-  var events = req.body.mandrill_events;
+  var events = JSON.parse(req.body.mandrill_events);
   var slackMessage;
   events.forEach(event => {
     if (event.event === 'hard_bounce') {
