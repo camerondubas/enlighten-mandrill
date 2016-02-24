@@ -1,7 +1,23 @@
+'use strict';
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
+var fs = require('fs');
 var app = express();
+var configPath = './.config.js';
+
+try {
+    fs.accessSync(configPath, fs.F_OK);
+    require(configPath);
+} catch (e) {
+    // It isn't accessible
+}
+
+// require('./.config');
+console.log('=============');
+console.log('PORT:', process.env.SLACK_URL);
+console.log('=============');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -14,26 +30,26 @@ app.get('/', (req, res) => {
 
 app.post('/webhooks/mandrill', (req, res) => {
   var events = JSON.parse(req.body.mandrill_events);
-  var slackMessage;
+
   events.forEach(event => {
     if (event.event === 'hard_bounce') {
-      slackMessage = {
+      let message = {
         "text": `It was sent to ${event.msg.email}`,
         "username": "An Email Just Bounced",
         "icon_emoji": ":email:"
       };
+
+      request.post({
+        url: process.env.SLACK_URL || null,
+        json: true,
+        body: message
+      }, (err, httpResponse, body) => {
+        // TODO: Error Handling/onComplete Function
+      });
     }
   }, this);
 
-  request.post({
-    url:'https://hooks.slack.com/services/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',
-    json: true,
-    body: slackMessage
-  }, function(err, httpResponse, body){
-      console.log('Post Complete');
-      console.log(err);
-      console.log(body);
-  });
+
 
    res.send(req.body);
 });
