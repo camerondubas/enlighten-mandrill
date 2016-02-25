@@ -5,14 +5,17 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var fs = require('fs');
 var app = express();
-var configPath = './.config.js';
+var env = process.env.NODE_ENV || "development";
 
-try {
+if (env === "development") {
+  try {
+    let configPath = './.config.js';
     fs.accessSync(configPath, fs.F_OK);
     require(configPath);
-} catch (e) {
-    // It isn't accessible
-    // TODO: Error handling
+  } catch (e) {
+    new Error('You must include a configuration file for local development');
+    process.exit();
+  }
 }
 
 app.set('port', (process.env.PORT || 5000));
