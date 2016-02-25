@@ -28,21 +28,26 @@ app.post('/webhooks/mandrill', (req, res) => {
   var events = JSON.parse(req.body.mandrill_events);
 
   events.forEach(event => {
-    if (event.event === 'hard_bounce') {
-      let message = {
-        "text": `It was sent to ${event.msg.email}`,
-        "username": "An Email Just Bounced",
-        "icon_emoji": ":email:"
-      };
+    let eventTypes = {
+      "hard_bounce": "An Email Just Hard-Bounced",
+      "soft_bounce": "An Email Just Soft-Bounced",
+      "reject": "An Email Was Just Rejected",
+      "default": "An Email Just Had An Issue"
+    };
 
-      request.post({
-        url: process.env.SLACK_URL || null,
-        json: true,
-        body: message
-      }, (err, httpResponse, body) => {
-        // TODO: Error Handling/onComplete Function
-      });
-    }
+    let message = {
+      "username": eventTypes[event.event] || eventTypes['default'],
+      "text": `It was sent to ${event.msg.email}`,
+      "icon_emoji": ":email:",
+    };
+
+    request.post({
+      url: process.env.SLACK_URL || null,
+      json: true,
+      body: message
+    }, (err, httpResponse, body) => {
+      // TODO: Error Handling/onComplete Function
+    });
   }, this);
 
    res.send(req.body);
