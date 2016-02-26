@@ -6,6 +6,9 @@ var request = require('request');
 var fs = require('fs');
 var app = express();
 var env = process.env.NODE_ENV || "development";
+var SlackMessage = require('./models/slack-message');
+var mandrillEventTypes = require('./utils/mandrill-event-types');
+
 
 if (env === "development") {
   try {
@@ -31,26 +34,13 @@ app.post('/webhooks/mandrill', (req, res) => {
   var events = JSON.parse(req.body.mandrill_events);
 
   events.forEach(event => {
-    let eventTypes = {
-      "hard_bounce": "An Email Just Hard-Bounced",
-      "soft_bounce": "An Email Just Soft-Bounced",
-      "reject": "An Email Was Just Rejected",
-      "default": "An Email Just Had An Issue"
-    };
-
     let message = {
-      "username": eventTypes[event.event] || eventTypes['default'],
-      "text": `It was sent to ${event.msg.email}`,
-      "icon_emoji": ":email:",
-    };
+      username: mandrillEventTypes[event.event] || mandrillEventTypes['default'],
+      text: `It was sent to ${event.msg.email}`,
+      iconEmoji: ":email:"
+    }
 
-    request.post({
-      url: process.env.SLACK_URL || null,
-      json: true,
-      body: message
-    }, (err, httpResponse, body) => {
-      // TODO: Error Handling/onComplete Function
-    });
+    new SlackMessage(message).sendWebhookMessage(process.env.SLACK_URL);
   }, this);
 
    res.send(req.body);
