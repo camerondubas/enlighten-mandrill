@@ -2,14 +2,13 @@
 var fs = require('fs');
 
 const env = process.env.NODE_ENV || "development"
+const configPath = '../.config.js';
 
 if (env === "development") {
   try {
-    let configPath = '../.config.js';
-    fs.accessSync(configPath, fs.F_OK);
     require(configPath);
   } catch (e) {
-    new Error('You must include a configuration file for local development');
+    throw new Error(`You must include a configuration file for local development. Cannot find module ${configPath}.`);
     process.exit();
   }
 }

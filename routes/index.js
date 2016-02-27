@@ -6,7 +6,7 @@ var express   = require('express');
 var router    = express.Router();
 
 router.get('/', (req, res) => {
-  res.send('<h1>Slack Mandrill</h1>');
+  res.status(200).send('<h1>Slack Mandrill</h1>');
 });
 
 
@@ -19,11 +19,8 @@ fs.readdirSync(__dirname)
     router.use('/' + route, require('./' + route));
   });
 
-// catch 404 and forward to error handler
-router.use((req, res, next) => {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+
+// Catch 404
+router.use((req, res, next) => res.status(404).send(`<h1>Error 404: Cannot ${req.method} ${req.url}.</h1>`));
 
 module.exports = router;
