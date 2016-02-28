@@ -11,7 +11,7 @@ class SlackMessage {
     };
   }
 
-  sendMessage(url) {
+  sendWebhookMessage(url) {
     return new Promise((resolve, reject) => {
         request.post({
         url: url || null,

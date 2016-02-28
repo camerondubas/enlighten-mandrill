@@ -5,7 +5,10 @@ var router              = express.Router();
 var SlackMessage        = require('../models/slack-message');
 var mandrillEventTypes  = require('../utils/mandrill-event-types');
 
-router.post('/mandrill', (req, res) => {
+router.post('/mandrill', function(req, res) {
+console.log(req.body);
+
+if (req.body.mandrill_events) {
   var events = JSON.parse(req.body.mandrill_events);
 
   events.forEach(event => {
@@ -17,8 +20,9 @@ router.post('/mandrill', (req, res) => {
 
     new SlackMessage(message).sendWebhookMessage(process.env.SLACK_URL);
   }, this);
+}
 
-   res.send(req.body);
+ res.send(req.body);
 });
 
 module.exports = router;
