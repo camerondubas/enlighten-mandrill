@@ -6,6 +6,9 @@ var SlackMessage        = require('../models/slack-message');
 var mandrillEventTypes  = require('../utils/mandrill-event-types');
 
 router.post('/mandrill', function(req, res) {
+  if (!req.get('X-Mandrill-Signature') || req.get('X-Mandrill-Signature') !== process.env.MANDRILL_SIGNATURE) {
+    res.status(503).send(req.body);
+  }
 if (req.body.mandrill_events) {
   var events = JSON.parse(req.body.mandrill_events);
 
@@ -45,7 +48,7 @@ if (req.body.mandrill_events) {
   }, this);
 }
 
- res.send(req.body);
+ res.status(200).send(req.body);
 });
 
 module.exports = router;
