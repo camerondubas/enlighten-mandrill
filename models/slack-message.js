@@ -7,7 +7,8 @@ class SlackMessage {
     this.message = {
       "username": msg.username || undefined,
       "text": msg.text || undefined,
-      "icon_emoji": msg.iconEmoji || undefined,
+      "icon_emoji": msg.icon_emoji || undefined,
+      "attachments": msg.attachments
     };
   }
 
