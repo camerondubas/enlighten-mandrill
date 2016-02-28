@@ -1,4 +1,5 @@
 'use strict';
+
 var request = require('request');
 
 class SlackMessage {
@@ -6,11 +7,12 @@ class SlackMessage {
     this.message = {
       "username": msg.username || undefined,
       "text": msg.text || undefined,
-      "icon_emoji": msg.iconEmoji || undefined,
+      "icon_emoji": msg.icon_emoji || undefined,
+      "attachments": msg.attachments
     };
   }
 
-  sendMessage(url) {
+  sendWebhookMessage(url) {
     return new Promise((resolve, reject) => {
         request.post({
         url: url || null,
