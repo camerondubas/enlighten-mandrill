@@ -23,4 +23,10 @@ fs.readdirSync(__dirname)
 // Catch 404
 router.use((req, res, next) => res.status(404).send(`<h1>Error 404: Cannot ${req.method} ${req.url}.</h1>`));
 
+// Handle Response
+router.use((data, req, res, next) => {
+  let status = data.status === undefined ? 200 : (data.status || 533);
+  res.status(status).send(data);
+});
+
 module.exports = router;
