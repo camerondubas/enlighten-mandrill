@@ -7,9 +7,12 @@ var MandrillEvent       = require('../models/mandrill-event');
 
 router.post('/mandrill', function(req, res, next) {
   if (!req.get('X-Mandrill-Signature') || req.get('X-Mandrill-Signature') !== process.env.MANDRILL_SIGNATURE) {
-    var e = new Error();
-    e.status = 401;
-    return next(e);
+    var error = {
+      message: `Invalid X-Mandrill-Signature: ${req.get('X-Mandrill-Signature')}`,
+      status: 401
+    };
+
+    return next(error);
   }
 if (req.body.mandrill_events) {
   var events = JSON.parse(req.body.mandrill_events);
