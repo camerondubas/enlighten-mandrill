@@ -9,7 +9,7 @@ var validateMandrill    = require('../utils/validate-mandrill');
 router.post('/mandrill', function(req, res, next) {
   if (!validateMandrill(req.body, req.get('X-Mandrill-Signature'))) {
     var error = {
-      message: `Invalid X-Mandrill-Signature: ${req.get('X-Mandrill-Signature')}`,
+      message: 'Error Validating X-Mandrill-Signature',
       status: 401
     };
 

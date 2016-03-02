@@ -2,7 +2,6 @@
 var crypto = require('crypto');
 
 module.exports = function (params, signature) {
-  console.log('Validate-Mandrill');
   let webhookKey = process.env.MANDRILL_WEBHOOK_KEY;
   let webhookEndpoint = process.env.MANDRILL_WEBHOOK_ENDPOINT;
 
@@ -15,9 +14,12 @@ module.exports = function (params, signature) {
     }
   };
 
-  let signer = crypto.createHmac('sha1', webhookKey);
-  let testSignature = signer.update(validationUrl).digest('base64');
-  console.log(testSignature);
-  console.log(signature);
-  return signature === testSignature ? true : false;
+  try {
+    let signer = crypto.createHmac('sha1', webhookKey);
+    let testSignature = signer.update(validationUrl).digest('base64');
+    return signature === testSignature ? true : false;
+
+  } catch (error) {
+    return false;
+  }
 }
