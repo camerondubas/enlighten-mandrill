@@ -9,11 +9,10 @@ router.get('/', (req, res) => {
   res.status(200).send('<h1>Slack Mandrill</h1>');
 });
 
-
 // Go through all the files in routes, and add each
 // eg user.js --makes url--> /user/
 fs.readdirSync(__dirname)
-  .filter(file => (file.indexOf(".") !== 0) && (file !== "index.js"))
+  .filter(file => (file.indexOf(".") > 0) && (file !== "index.js"))
   .forEach(file => {
     let route = file.replace(path.extname(file), '');
     router.use('/' + route, require('./' + route));
