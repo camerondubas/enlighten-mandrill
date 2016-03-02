@@ -4,9 +4,10 @@ var express             = require('express');
 var router              = express.Router();
 var SlackMessage        = require('../models/slack-message');
 var MandrillEvent       = require('../models/mandrill-event');
+var validateMandrill    = require('../utils/validate-mandrill');
 
 router.post('/mandrill', function(req, res, next) {
-  if (!req.get('X-Mandrill-Signature') || req.get('X-Mandrill-Signature') !== process.env.MANDRILL_SIGNATURE) {
+  if (!validateMandrill(req.body, req.get('X-Mandrill-Signature'))) {
     var error = {
       message: `Invalid X-Mandrill-Signature: ${req.get('X-Mandrill-Signature')}`,
       status: 401
