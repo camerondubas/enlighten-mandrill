@@ -1,12 +1,33 @@
 'use strict';
 
 var stringOperations = require('../utils/string-operations');
+var crypto = require('crypto');
+var request = require('request');
 
 class MandrillEvent {
-  constructor(type, message) {
-    this.message = this[
-      stringOperations.toCamelCase(type) || 'default'
-    ](message);
+  constructor(request) {
+    this.body = request.body;
+    this.signature = request.get('X-Mandrill-Signature');
+    this.messages = [];
+
+    if (this.validateRequest()) {
+      let events = JSON.parse(this.body.mandrill_events) || [];
+      events.forEach(event => this.addmessage(event));
+    } else {
+      // Handle Error Case
+      var error = {
+        message: 'Error Validating X-Mandrill-Signature',
+        status: 401
+      };
+
+      throw error;
+    }
+  }
+
+  addEvent(event) {
+    this.messages.push(
+      this[stringOperations.toCamelCase(event.event) || 'default'](event.message)
+    );
   }
 
   hardBounce(message) {
@@ -133,12 +154,17 @@ class MandrillEvent {
     };
   }
 
-  sendWebhookMessage(url) {
+
+  sendAllMessages() {
+    this.messages.forEach(message => this.sendWebhookMessage(message));
+  }
+
+  sendWebhookMessage(message, url) {
     return new Promise((resolve, reject) => {
         request.post({
         url: url || null,
         json: true,
-        body: this.message
+        body: message
         }, (err, httpResponse, body) => {
         // TODO: Error Handling/onComplete Function
             resolve(body || null)
@@ -147,23 +173,23 @@ class MandrillEvent {
   }
 
 
-  validateRequest(params, signature) {
+  validateRequest() {
     let webhookKey = process.env.MANDRILL_WEBHOOK_KEY;
     let webhookEndpoint = process.env.MANDRILL_WEBHOOK_ENDPOINT;
 
     let validationUrl = webhookEndpoint;
 
     // TODO: Sort params alphabetically
-    for (let key in params) {
-      if (params.hasOwnProperty(key)) {
-        validationUrl += key + params[key];
+    for (let key in this.body) {
+      if (this.body.hasOwnProperty(key)) {
+        validationUrl += key + this.body[key];
       }
     };
 
     try {
       let signer = crypto.createHmac('sha1', webhookKey);
       let testSignature = signer.update(validationUrl).digest('base64');
-      return signature === testSignature ? true : false;
+      return this.signature === testSignature ? true : false;
 
     } catch (error) {
       return false;
