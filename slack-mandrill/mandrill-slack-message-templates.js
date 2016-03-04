@@ -1,15 +1,7 @@
 'use strict';
 
-var stringOperations = require('../utils/string-operations');
-
-class MandrillEvent {
-  constructor(type, message) {
-    this.message = this[
-      stringOperations.toCamelCase(type) || 'default'
-    ](message);
-  }
-
-  hardBounce(message) {
+class MandrillSlackMessageTemplates {
+  static hardBounce(message) {
     return {
       username: "An Email Just Hard-Bounced",
       text: '',
@@ -37,10 +29,10 @@ class MandrillEvent {
           ]
         }
       ]
-    };
-  }
+    }
+  };
 
-  softBounce(message) {
+  static softBounce(message) {
     return {
       username: "An Email Just Soft-Bounced",
       text: '',
@@ -71,7 +63,7 @@ class MandrillEvent {
     };
   }
 
-  reject(message) {
+  static reject(message) {
     return {
       username: "An Email Was Just Rejected",
       text: '',
@@ -102,7 +94,7 @@ class MandrillEvent {
     };
   }
 
-  default(message) {
+  static default(message) {
     return {
       username: "An Email Just Had An Issue",
       text: '',
@@ -132,8 +124,7 @@ class MandrillEvent {
       ]
     };
   }
+}
 
-};
 
-
-module.exports = MandrillEvent;
+module.exports = MandrillSlackMessageTemplates;

@@ -1,1 +1,0 @@
-process.env['SLACK_URL'] = '<SLACK INCOMING WEBHOOK URL>';
