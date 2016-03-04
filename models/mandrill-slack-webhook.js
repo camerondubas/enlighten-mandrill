@@ -19,7 +19,6 @@ class MandrillSlackWebhook {
 
     } catch (error) {
       console.log(error);
-
     }
 
   }
@@ -32,8 +31,6 @@ class MandrillSlackWebhook {
 
 
   sendAllMessages(url) {
-    console.log('a');
-
     return new Promise((resolve, reject) => {
       if (this.validateRequest()) {
         this.messages.forEach(message => this.sendWebhookMessage(message, url));
@@ -59,18 +56,14 @@ class MandrillSlackWebhook {
         body: message
         }, (err, httpResponse, body) => {
         // TODO: Error Handling/onComplete Function
-          console.log('success');
-            resolve(body || null)
+          resolve(body || null);
         });
     })
   }
 
 
   validateRequest() {
-    let webhookKey = this.mandrillKey;
-    let webhookEndpoint = this.mandrillEndpoint;
-
-    let validationUrl = webhookEndpoint;
+    let validationUrl = this.mandrillEndpoint;
 
     // TODO: Sort params alphabetically
     for (let key in this.body) {
@@ -80,7 +73,7 @@ class MandrillSlackWebhook {
     };
 
     try {
-      let signer = crypto.createHmac('sha1', webhookKey);
+      let signer = crypto.createHmac('sha1', this.mandrillKey);
       let testSignature = signer.update(validationUrl).digest('base64');
       return this.signature === testSignature ? true : false;
 
