@@ -10,18 +10,8 @@ class MandrillEvent {
     this.signature = request.get('X-Mandrill-Signature');
     this.messages = [];
 
-    if (this.validateRequest()) {
-      let events = JSON.parse(this.body.mandrill_events) || [];
-      events.forEach(event => this.addmessage(event));
-    } else {
-      // Handle Error Case
-      var error = {
-        message: 'Error Validating X-Mandrill-Signature',
-        status: 401
-      };
-
-      throw error;
-    }
+    let events = JSON.parse(this.body.mandrill_events) || [];
+    events.forEach(event => this.addmessage(event));
   }
 
   addEvent(event) {
@@ -156,7 +146,17 @@ class MandrillEvent {
 
 
   sendAllMessages() {
-    this.messages.forEach(message => this.sendWebhookMessage(message));
+    if (this.validateRequest()) {
+      this.messages.forEach(message => this.sendWebhookMessage(message));
+    } else {
+      // Handle Error Case
+      var error = {
+        message: 'Error Validating X-Mandrill-Signature',
+        status: 401
+      };
+
+      throw error;
+    }
   }
 
   sendWebhookMessage(message, url) {
