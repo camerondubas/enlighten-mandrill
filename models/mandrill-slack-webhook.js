@@ -1,162 +1,54 @@
 'use strict';
 
-var stringOperations = require('../utils/string-operations');
+var stringOperations = require('./string-operations');
+var messageTemplates = require('./mandrill-slack-message-templates');
 var crypto = require('crypto');
 var request = require('request');
 
-class MandrillEvent {
-  constructor(request) {
-    this.body = request.body;
-    this.signature = request.get('X-Mandrill-Signature');
+class MandrillSlackWebhook {
+  constructor(req, mandrillKey, mandrillEndpoint) {
+    this.body = req.body;
+    this.signature = req.get('X-Mandrill-Signature');
+    this.mandrillKey = mandrillKey;
+    this.mandrillEndpoint = mandrillEndpoint;
     this.messages = [];
 
-    let events = JSON.parse(this.body.mandrill_events) || [];
-    events.forEach(event => this.addmessage(event));
+    try {
+      let events = JSON.parse(this.body.mandrill_events) || [];
+      events.forEach(event => this.addMessage(event));
+
+    } catch (error) {
+      console.log(error);
+
+    }
+
   }
 
-  addEvent(event) {
+  addMessage(event) {
     this.messages.push(
-      this[stringOperations.toCamelCase(event.event) || 'default'](event.message)
+      messageTemplates[stringOperations.toCamelCase(event.event) || 'default'](event.msg)
     );
   }
 
-  hardBounce(message) {
-    return {
-      username: "An Email Just Hard-Bounced",
-      text: '',
-      icon_emoji: ":email:",
-      attachments: [
-        {
-          "fallback": `It was sent to ${message.email}`,
-          "color": "danger",
-          "fields": [
-            {
-              "title": 'Sent To',
-              "value": message.email,
-              "short": true,
-            },
-            {
-              "title": 'Subject',
-              "value": message.subject,
-              "short": true,
-            },
-            {
-              "title": 'Error Description',
-              "value": message.diag || "No description provided.",
-              "short": false,
-            }
-          ]
-        }
-      ]
-    };
-  }
 
-  softBounce(message) {
-    return {
-      username: "An Email Just Soft-Bounced",
-      text: '',
-      icon_emoji: ":email:",
-      attachments: [
-        {
-          "fallback": `It was sent to ${message.email}`,
-          "color": "warning",
-          "fields": [
-            {
-              "title": 'Sent To',
-              "value": message.email,
-              "short": true,
-            },
-            {
-              "title": 'Subject',
-              "value": message.subject,
-              "short": true,
-            },
-            {
-              "title": 'Error Description',
-              "value": message.diag || "No description provided.",
-              "short": false,
-            }
-          ]
-        }
-      ]
-    };
-  }
+  sendAllMessages(url) {
+    console.log('a');
 
-  reject(message) {
-    return {
-      username: "An Email Was Just Rejected",
-      text: '',
-      icon_emoji: ":email:",
-      attachments: [
-        {
-          "fallback": `It was sent to ${message.email}`,
-          "color": "danger",
-          "fields": [
-            {
-              "title": 'Sent To',
-              "value": message.email,
-              "short": true,
-            },
-            {
-              "title": 'Subject',
-              "value": message.subject,
-              "short": true,
-            },
-            {
-              "title": 'Error Description',
-              "value": message.diag || "No description provided.",
-              "short": false,
-            }
-          ]
-        }
-      ]
-    };
-  }
+    return new Promise((resolve, reject) => {
+      if (this.validateRequest()) {
+        this.messages.forEach(message => this.sendWebhookMessage(message, url));
+        resolve(this.messages);
+      } else {
+        // Handle Error Case
+        var error = {
+          message: 'Error Validating X-Mandrill-Signature',
+          status: 401
+        };
 
-  default(message) {
-    return {
-      username: "An Email Just Had An Issue",
-      text: '',
-      icon_emoji: ":email:",
-      attachments: [
-        {
-          "fallback": `It was sent to ${message.email}`,
-          "color": "warning",
-          "fields": [
-            {
-              "title": 'Sent To',
-              "value": message.email,
-              "short": true,
-            },
-            {
-              "title": 'Subject',
-              "value": message.subject,
-              "short": true,
-            },
-            {
-              "title": 'Error Description',
-              "value": message.diag || "No description provided.",
-              "short": false,
-            }
-          ]
-        }
-      ]
-    };
-  }
+        reject(error);
+      }
 
-
-  sendAllMessages() {
-    if (this.validateRequest()) {
-      this.messages.forEach(message => this.sendWebhookMessage(message));
-    } else {
-      // Handle Error Case
-      var error = {
-        message: 'Error Validating X-Mandrill-Signature',
-        status: 401
-      };
-
-      throw error;
-    }
+    })
   }
 
   sendWebhookMessage(message, url) {
@@ -167,6 +59,7 @@ class MandrillEvent {
         body: message
         }, (err, httpResponse, body) => {
         // TODO: Error Handling/onComplete Function
+          console.log('success');
             resolve(body || null)
         });
     })
@@ -174,8 +67,8 @@ class MandrillEvent {
 
 
   validateRequest() {
-    let webhookKey = process.env.MANDRILL_WEBHOOK_KEY;
-    let webhookEndpoint = process.env.MANDRILL_WEBHOOK_ENDPOINT;
+    let webhookKey = this.mandrillKey;
+    let webhookEndpoint = this.mandrillEndpoint;
 
     let validationUrl = webhookEndpoint;
 
@@ -198,4 +91,4 @@ class MandrillEvent {
 };
 
 
-module.exports = MandrillEvent;
+module.exports = MandrillSlackWebhook;
