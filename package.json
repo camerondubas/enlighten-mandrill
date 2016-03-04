@@ -1,16 +1,14 @@
 {
-  "name": "slack-mandrill",
+  "name": "enlighten-mandrill",
   "version": "0.0.1",
   "description": "Mandrill webhook integration for slack",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
-    "dev": "NODE_ENV=development node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/camerondubas/slack-mandrill.git"
+    "url": "git+https://github.com/camerondubas/enlighten-mandrill.git"
   },
   "keywords": [
     "slack",
@@ -20,9 +18,9 @@
   "author": "Cameron Dubas",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/camerondubas/slack-mandrill/issues"
+    "url": "https://github.com/camerondubas/enlighten-mandrill/issues"
   },
-  "homepage": "https://github.com/camerondubas/slack-mandrill#readme",
+  "homepage": "https://github.com/camerondubas/enlighten-mandrill#readme",
   "dependencies": {
     "crypto": "0.0.3",
     "request": "^2.69.0"
